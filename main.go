@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
 var (
@@ -20,8 +21,15 @@ func version() string {
 
 func main() {
 	log.Printf("started")
-	router := http.NewServeMux()
-	router.HandleFunc("/api/v1/ping", apiPing)
+
+	rh := func(ctx *fasthttp.RequestCtx) {
+		switch string(ctx.Path()) {
+		case "/api/v1/ping":
+			apiPing(ctx)
+		default:
+			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
+		}
+	}
 
 	var cfgDefaultErr error
 	CONFIG, cfgDefaultErr = loadAppConfigDefaults(CONFIG)
@@ -37,5 +45,5 @@ func main() {
 	}
 
 	log.Printf("listening on port %d\n", CONFIG.Port)
-	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%d", CONFIG.Port), router))
+	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf(":%d", CONFIG.Port), rh))
 }

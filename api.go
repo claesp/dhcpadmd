@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
-func apiPing(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(CONFIG)
+func apiPing(ctx *fasthttp.RequestCtx) {
+	json.NewEncoder(ctx).Encode(CONFIG)
 }
