@@ -33,14 +33,22 @@ func api() {
 	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
 }
 
-func main() {
+func config() error {
 	CONFIG = loadAppConfigDefaults(CONFIG)
 
 	var err error
-	cfg := fmt.Sprintf("%s.conf", APPNAME)
-	CONFIG, err = loadAppConfigFromFile(CONFIG, cfg)
+	CONFIG, err = loadAppConfigFromFile(CONFIG, fmt.Sprintf("%s.conf", APPNAME))
 	if err != nil {
-		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file '%s' failed: %s", cfg, err))
+		return err
+	}
+
+	return nil
+}
+
+func main() {
+	err := config()
+	if err != nil {
+		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file failed: %s", err))
 	}
 
 	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
