@@ -51,16 +51,7 @@ func out(level DebugLevel, section string, text string) {
 	}
 }
 
-func main() {
-	CONFIG = loadAppConfigDefaults(CONFIG)
-
-	var cfgFileErr error
-	cfgFilename := fmt.Sprintf("%s.conf", APPNAME)
-	CONFIG, cfgFileErr = loadAppConfigFromFile(CONFIG, cfgFilename)
-	if cfgFileErr != nil {
-		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file '%s' failed: %s", cfgFilename, cfgFileErr))
-	}
-
+func api() {
 	rh := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 		case "/api/v1/ping":
@@ -70,8 +61,22 @@ func main() {
 		}
 	}
 
-	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
-	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
 	out(DebugLevelInfo, "main", fmt.Sprintf("listening on %s:%d", CONFIG.Host, CONFIG.Port))
 	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
+}
+
+func main() {
+	CONFIG = loadAppConfigDefaults(CONFIG)
+
+	var err error
+	cfg := fmt.Sprintf("%s.conf", APPNAME)
+	CONFIG, err = loadAppConfigFromFile(CONFIG, cfg)
+	if err != nil {
+		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file '%s' failed: %s", cfg, err))
+	}
+
+	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
+	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
+
+	api()
 }
