@@ -8,19 +8,42 @@ import (
 )
 
 var (
-	APP_NAME = "dhcpdadmd"
+	APPNAME  = "dhcpdadmd"
 	MAJOR    = 0
 	MINOR    = 1
-	REVISION = 2201091308
+	REVISION = 220624
 	CONFIG   AppConfig
+)
+
+type DebugLevel int
+
+const (
+	DebugLevelDebug DebugLevel = iota
+	DebugLevelInfo
+	DebugLevelWarning
+	DebugLevelCritical
 )
 
 func version() string {
 	return fmt.Sprintf("%d.%d.%d", MAJOR, MINOR, REVISION)
 }
 
+func out(level DebugLevel, section string, text string) {
+	if CONFIG.DebugLevel <= level {
+		log.Printf("%s: %s: %s\n", CONFIG.AppName, section, text)
+	}
+}
+
 func main() {
-	log.Printf("started")
+	CONFIG = loadAppConfigDefaults(CONFIG)
+	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
+
+	var cfgFileErr error
+	cfgFilename := fmt.Sprintf("%s.conf", APPNAME)
+	CONFIG, cfgFileErr = loadAppConfigFromFile(CONFIG, cfgFilename)
+	if cfgFileErr != nil {
+		out(DebugLevelCritical, "main", fmt.Sprintf("configuration file '%s' loading failed: %s", cfgFilename, cfgFileErr))
+	}
 
 	rh := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
@@ -31,19 +54,6 @@ func main() {
 		}
 	}
 
-	var cfgDefaultErr error
-	CONFIG, cfgDefaultErr = loadAppConfigDefaults(CONFIG)
-	if cfgDefaultErr != nil {
-		log.Fatalln("configuration loading failed:", cfgDefaultErr)
-	}
-
-	var cfgFileErr error
-	cfgFilename := fmt.Sprintf("%s.conf", APP_NAME)
-	CONFIG, cfgFileErr = loadAppConfigFromFile(CONFIG, cfgFilename)
-	if cfgFileErr != nil {
-		log.Println(fmt.Sprintf("configuration file '%s' loading failed:", cfgFilename), cfgFileErr)
-	}
-
-	log.Printf("listening on port %d\n", CONFIG.Port)
-	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf(":%d", CONFIG.Port), rh))
+	out(DebugLevelInfo, "main", fmt.Sprintf("listening on %s:%d", CONFIG.Host, CONFIG.Port))
+	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
 }

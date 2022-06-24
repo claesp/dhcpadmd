@@ -6,19 +6,23 @@ import (
 )
 
 type AppConfig struct {
-	AppName      string `json:"appname",omitempty`
-	DatabasePath string `json:"dbpath",omitempty`
-	Version      string `json:"version",omitempty`
-	Port         int    `json:"port",omitempty`
+	AppName      string     `json:"appname",omitempty`
+	DatabasePath string     `json:"dbpath",omitempty`
+	DebugLevel   DebugLevel `json:"debug_level",omitempty`
+	Version      string     `json:"version",omitempty`
+	Host         string     `json:"host",omitempty`
+	Port         int        `json:"port",omitempty`
 }
 
-func loadAppConfigDefaults(config AppConfig) (AppConfig, error) {
-	config.AppName = APP_NAME
+func loadAppConfigDefaults(config AppConfig) AppConfig {
+	config.AppName = APPNAME
 	config.DatabasePath = ""
+	config.DebugLevel = DebugLevelInfo
 	config.Version = version()
+	config.Host = "127.0.0.1"
 	config.Port = 9091
 
-	return config, nil
+	return config
 }
 
 func loadAppConfigFromFile(config AppConfig, filename string) (AppConfig, error) {
