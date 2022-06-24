@@ -9,18 +9,20 @@ type AppConfig struct {
 	AppName      string     `json:"appname",omitempty`
 	DatabasePath string     `json:"dbpath",omitempty`
 	DebugLevel   DebugLevel `json:"debug_level",omitempty`
-	Version      string     `json:"version",omitempty`
 	Host         string     `json:"host",omitempty`
+	InstanceName string     `json:"instance",omitempt`
 	Port         int        `json:"port",omitempty`
+	Version      string     `json:"version",omitempty`
 }
 
 func loadAppConfigDefaults(config AppConfig) AppConfig {
 	config.AppName = APPNAME
 	config.DatabasePath = ""
-	config.DebugLevel = DebugLevelInfo
-	config.Version = version()
+	config.DebugLevel = DebugLevelDebug
 	config.Host = "127.0.0.1"
+	config.InstanceName = "default"
 	config.Port = 9091
+	config.Version = version()
 
 	return config
 }
@@ -37,8 +39,29 @@ func loadAppConfigFromFile(config AppConfig, filename string) (AppConfig, error)
 		return config, jsonErr
 	}
 
-	config.Port = cfg.Port
-	config.DatabasePath = cfg.DatabasePath
+	if cfg.InstanceName != "" {
+		config.InstanceName = cfg.InstanceName
+	}
+
+	if cfg.DatabasePath != "" {
+		config.DatabasePath = cfg.DatabasePath
+	}
+
+	if cfg.DebugLevel != 0 {
+		if cfg.DebugLevel > DebugLevelCritical {
+			config.DebugLevel = DebugLevelCritical
+		} else {
+			config.DebugLevel = cfg.DebugLevel
+		}
+	}
+
+	if cfg.Host != "" {
+		config.Host = cfg.Host
+	}
+
+	if cfg.Port != 0 {
+		config.Port = cfg.Port
+	}
 
 	return config, nil
 }

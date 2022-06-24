@@ -17,8 +17,25 @@ var (
 
 type DebugLevel int
 
+func (d DebugLevel) String() string {
+	switch d {
+	case DebugLevelUndefined:
+		return "UNDEFINED"
+	case DebugLevelDebug:
+		return "DEBUG"
+	case DebugLevelInfo:
+		return "INFO"
+	case DebugLevelWarning:
+		return "WARNING"
+	case DebugLevelCritical:
+		return "CRITICAL"
+	}
+	return "UNKNOWN"
+}
+
 const (
-	DebugLevelDebug DebugLevel = iota
+	DebugLevelUndefined DebugLevel = iota
+	DebugLevelDebug
 	DebugLevelInfo
 	DebugLevelWarning
 	DebugLevelCritical
@@ -36,13 +53,12 @@ func out(level DebugLevel, section string, text string) {
 
 func main() {
 	CONFIG = loadAppConfigDefaults(CONFIG)
-	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
 
 	var cfgFileErr error
 	cfgFilename := fmt.Sprintf("%s.conf", APPNAME)
 	CONFIG, cfgFileErr = loadAppConfigFromFile(CONFIG, cfgFilename)
 	if cfgFileErr != nil {
-		out(DebugLevelCritical, "main", fmt.Sprintf("configuration file '%s' loading failed: %s", cfgFilename, cfgFileErr))
+		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file '%s' failed: %s", cfgFilename, cfgFileErr))
 	}
 
 	rh := func(ctx *fasthttp.RequestCtx) {
@@ -54,6 +70,8 @@ func main() {
 		}
 	}
 
+	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
+	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
 	out(DebugLevelInfo, "main", fmt.Sprintf("listening on %s:%d", CONFIG.Host, CONFIG.Port))
 	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
 }
