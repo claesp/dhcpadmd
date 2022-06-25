@@ -19,16 +19,14 @@ func version() string {
 	return fmt.Sprintf("%d.%d.%d", MAJOR, MINOR, REVISION)
 }
 
-func config() error {
+func config() {
 	CONFIG = loadAppConfigDefaults(CONFIG)
 
 	var err error
 	CONFIG, err = loadAppConfigFromFile(CONFIG, fmt.Sprintf("%s.conf", APPNAME))
 	if err != nil {
-		return err
+		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file '%s' failed: %s", fmt.Sprintf("%s.conf", APPNAME), err))
 	}
-
-	return nil
 }
 
 func server() {
@@ -46,10 +44,7 @@ func server() {
 }
 
 func main() {
-	err := config()
-	if err != nil {
-		out(DebugLevelCritical, "main", fmt.Sprintf("loading configuration file failed: %s", err))
-	}
+	config()
 
 	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
 	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
