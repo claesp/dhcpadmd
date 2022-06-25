@@ -19,20 +19,6 @@ func version() string {
 	return fmt.Sprintf("%d.%d.%d", MAJOR, MINOR, REVISION)
 }
 
-func api() {
-	rh := func(ctx *fasthttp.RequestCtx) {
-		switch string(ctx.Path()) {
-		case "/api/v1/ping":
-			apiPing(ctx)
-		default:
-			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
-		}
-	}
-
-	out(DebugLevelInfo, "main", fmt.Sprintf("listening on %s:%d", CONFIG.Host, CONFIG.Port))
-	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
-}
-
 func config() error {
 	CONFIG = loadAppConfigDefaults(CONFIG)
 
@@ -45,6 +31,20 @@ func config() error {
 	return nil
 }
 
+func server() {
+	rh := func(ctx *fasthttp.RequestCtx) {
+		switch string(ctx.Path()) {
+		case "/api/v1/ping":
+			apiPing(ctx)
+		default:
+			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
+		}
+	}
+
+	out(DebugLevelInfo, "server", fmt.Sprintf("listening on %s:%d", CONFIG.Host, CONFIG.Port))
+	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
+}
+
 func main() {
 	err := config()
 	if err != nil {
@@ -54,5 +54,5 @@ func main() {
 	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
 	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
 
-	api()
+	server()
 }
