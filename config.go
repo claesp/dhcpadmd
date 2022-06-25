@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -17,10 +18,10 @@ type AppConfig struct {
 
 func loadAppConfigDefaults(config AppConfig) AppConfig {
 	config.AppName = APPNAME
-	config.DatabasePath = ""
 	config.DebugLevel = DebugLevelDebug
 	config.Host = "127.0.0.1"
 	config.InstanceName = "default"
+	config.DatabasePath = fmt.Sprintf("./%s", config.InstanceName)
 	config.Port = 9091
 	config.Version = version()
 
