@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"git.mills.io/prologic/bitcask"
 	"github.com/valyala/fasthttp"
 )
 
@@ -13,6 +14,7 @@ var (
 	MINOR    = 1
 	REVISION = 220624
 	CONFIG   AppConfig
+	DATABASE *bitcask.Bitcask
 )
 
 func version() string {
@@ -48,6 +50,13 @@ func main() {
 
 	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
 	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
+
+	var dbErr error
+	DATABASE, dbErr = bitcask.Open(CONFIG.DatabasePath)
+	if dbErr != nil {
+		out(DebugLevelInfo, "main", fmt.Sprintf("unable to open database file '%s': %s", CONFIG.DatabasePath, dbErr))
+	}
+	defer DATABASE.Close()
 
 	server()
 }
