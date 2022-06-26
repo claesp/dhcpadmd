@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 )
 
 type AppConfig struct {
@@ -14,6 +15,7 @@ type AppConfig struct {
 	InstanceName string     `json:"instance",omitempt`
 	Port         int        `json:"port",omitempty`
 	Version      string     `json:"version",omitempty`
+	Started      time.Time  `json:"started",omitempty`
 }
 
 func loadAppConfigDefaults(config AppConfig) AppConfig {
@@ -24,6 +26,7 @@ func loadAppConfigDefaults(config AppConfig) AppConfig {
 	config.DatabasePath = fmt.Sprintf("./%s", config.InstanceName)
 	config.Port = 9091
 	config.Version = version()
+	config.Started = time.Now()
 
 	return config
 }
