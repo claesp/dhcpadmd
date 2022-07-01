@@ -1,4 +1,4 @@
-module github.com/claesp/dhcpdadmd
+module git.sr.ht/~u472892/dhcpdadmd
 
 go 1.17
 
