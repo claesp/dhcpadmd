@@ -45,6 +45,7 @@ func loadAppConfigFromFile(config AppConfig, filename string) (AppConfig, error)
 
 	if cfg.InstanceName != "" {
 		config.InstanceName = cfg.InstanceName
+		config.DatabasePath = fmt.Sprintf("./%s", config.InstanceName)
 	}
 
 	if cfg.DatabasePath != "" {
