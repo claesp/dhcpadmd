@@ -50,6 +50,7 @@ func main() {
 
 	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
 	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
+	out(DebugLevelInfo, "main", fmt.Sprintf("instance is '%s'", CONFIG.InstanceName))
 
 	var dbErr error
 	DATABASE, dbErr = bitcask.Open(CONFIG.DatabasePath)
