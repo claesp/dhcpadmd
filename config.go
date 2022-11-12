@@ -7,23 +7,29 @@ import (
 	"time"
 )
 
+type AppConfigInstance struct {
+	Name              string `json:"name"`
+	ConfigurationFile string `json:"configuration_file"`
+}
+
 type AppConfig struct {
-	AppName      string     `json:"appname",omitempty`
-	DatabasePath string     `json:"dbpath",omitempty`
-	DebugLevel   DebugLevel `json:"debug_level",omitempty`
-	Host         string     `json:"host",omitempty`
-	InstanceName string     `json:"instance",omitempt`
-	Port         int        `json:"port",omitempty`
-	Version      string     `json:"version",omitempty`
-	Started      time.Time  `json:"started",omitempty`
+	AppName      string              `json:"appname",omitempty`
+	DatabasePath string              `json:"dbpath",omitempty`
+	DebugLevel   DebugLevel          `json:"debug_level",omitempty`
+	Host         string              `json:"host",omitempty`
+	Agent        string              `json:"agent",omitempt`
+	Port         int                 `json:"port",omitempty`
+	Version      string              `json:"version",omitempty`
+	Started      time.Time           `json:"started",omitempty`
+	Instances    []AppConfigInstance `json:"instances",omitempt`
 }
 
 func loadAppConfigDefaults(config AppConfig) AppConfig {
 	config.AppName = APPNAME
 	config.DebugLevel = DebugLevelDebug
 	config.Host = "127.0.0.1"
-	config.InstanceName = "default"
-	config.DatabasePath = fmt.Sprintf("./%s", config.InstanceName)
+	config.Agent = "default"
+	config.DatabasePath = fmt.Sprintf("./%s", config.Agent)
 	config.Port = 9091
 	config.Version = version()
 	config.Started = time.Now()
@@ -43,9 +49,9 @@ func loadAppConfigFromFile(config AppConfig, filename string) (AppConfig, error)
 		return config, jsonErr
 	}
 
-	if cfg.InstanceName != "" {
-		config.InstanceName = cfg.InstanceName
-		config.DatabasePath = fmt.Sprintf("./%s", config.InstanceName)
+	if cfg.Agent != "" {
+		config.Agent = cfg.Agent
+		config.DatabasePath = fmt.Sprintf("./%s", config.Agent)
 	}
 
 	if cfg.DatabasePath != "" {
@@ -66,6 +72,10 @@ func loadAppConfigFromFile(config AppConfig, filename string) (AppConfig, error)
 
 	if cfg.Port != 0 {
 		config.Port = cfg.Port
+	}
+
+	if len(cfg.Instances) > 0 {
+		config.Instances = cfg.Instances
 	}
 
 	return config, nil

@@ -4,8 +4,11 @@ go 1.17
 
 require (
 	git.mills.io/prologic/bitcask v1.0.2
+	git.sr.ht/~u472892/libiscdhcpd v0.0.0
 	github.com/valyala/fasthttp v1.31.0
 )
+
+replace git.sr.ht/~u472892/libiscdhcpd v0.0.0 => /Users/claes/code/libiscdhcpd
 
 require (
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect

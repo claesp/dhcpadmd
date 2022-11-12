@@ -12,7 +12,7 @@ var (
 	APPNAME  = "dhcpdadmd"
 	MAJOR    = 0
 	MINOR    = 1
-	REVISION = 220624
+	REVISION = 221112
 	CONFIG   AppConfig
 	DATABASE *bitcask.Bitcask
 )
@@ -36,6 +36,8 @@ func server() {
 		switch string(ctx.Path()) {
 		case "/api/v1/ping":
 			apiPing(ctx)
+		case "/api/v1/view":
+			apiView(ctx)
 		default:
 			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
 		}
@@ -50,7 +52,11 @@ func main() {
 
 	out(DebugLevelInfo, "main", fmt.Sprintf("starting version %s", version()))
 	out(DebugLevelInfo, "main", fmt.Sprintf("current debug level is %s", CONFIG.DebugLevel))
-	out(DebugLevelInfo, "main", fmt.Sprintf("instance is '%s'", CONFIG.InstanceName))
+	out(DebugLevelInfo, "main", fmt.Sprintf("agent is '%s'", CONFIG.Agent))
+	out(DebugLevelInfo, "main", fmt.Sprintf("instances:"))
+	for _, instance := range CONFIG.Instances {
+		out(DebugLevelInfo, "main", fmt.Sprintf("- instance '%s' at '%s'", instance.Name, instance.ConfigurationFile))
+	}
 
 	var dbErr error
 	DATABASE, dbErr = bitcask.Open(CONFIG.DatabasePath)
