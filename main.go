@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"git.mills.io/prologic/bitcask"
-	"github.com/valyala/fasthttp"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -32,19 +32,13 @@ func config() {
 }
 
 func server() {
-	rh := func(ctx *fasthttp.RequestCtx) {
-		switch string(ctx.Path()) {
-		case "/api/v1/ping":
-			apiPing(ctx)
-		case "/api/v1/view":
-			apiView(ctx)
-		default:
-			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
-		}
-	}
+	app := fiber.New()
+
+	app.Get("/api/v1/ping", apiPing)
+	app.Get("/api/v1/view", apiView)
 
 	out(DebugLevelInfo, "server", fmt.Sprintf("listening on %s:%d", CONFIG.Host, CONFIG.Port))
-	log.Fatalln(fasthttp.ListenAndServe(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port), rh))
+	log.Fatalln(app.Listen(fmt.Sprintf("%s:%d", CONFIG.Host, CONFIG.Port)))
 }
 
 func main() {

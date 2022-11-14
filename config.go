@@ -10,6 +10,11 @@ import (
 type AppConfigInstance struct {
 	Name              string `json:"name"`
 	ConfigurationFile string `json:"configuration_file"`
+	StartCommand      string `json:"start_cmd"`
+	StopCommand       string `json:"stop_cmd"`
+	ReloadCommand     string `json:"reload_cmd"`
+	RestartCommand    string `json:"restart_cmd"`
+	TestCommand       string `json:"test_cmd"`
 }
 
 type AppConfig struct {
