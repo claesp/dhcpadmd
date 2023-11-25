@@ -8,7 +8,7 @@ require (
 	github.com/valyala/fasthttp v1.40.0
 )
 
-replace git.sr.ht/~u472892/libiscdhcpd v0.0.0 => /Users/claes/code/libiscdhcpd
+replace git.sr.ht/~u472892/libiscdhcpd v0.0.0 => /Users/claes/Documents/Code/libiscdhcpd
 
 require (
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
